@@ -1,0 +1,34 @@
+{
+  "name": "chat-conversation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev":"pnpm --filter page dev",
+    "build:page":"pnpm --filter page build",
+    "build:react":"pnpm --filter react build",
+    "preview":"pnpm --filter page preview"
+  },
+  "author": "ferretangel",
+  "license": "MIT",
+  "packageManager": "pnpm@10.10.0",
+  "dependencies": {
+    "chat-conversation-react": "workspace:*"
+  },
+  "keywords": [
+    "tree",
+    "chat-tree",
+    "tree-render",
+    "chat",
+    "chat-conversation",
+    "conversation",
+    "conversation-tree",
+    "conversation-render",
+    "conversation-render-tree",
+    "conversation-list",
+    "react",
+    "ai",
+    "typescript"
+  ]
+}

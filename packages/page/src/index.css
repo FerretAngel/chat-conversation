@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@source './node_modules/chat-conversation-react/dist/**/*.{js,ts,jsx,tsx}';
+button {
+  @apply bg-neutral-100 rounded-md p-2 cursor-pointer hover:bg-gray-200 active:bg-gray-200;
+}
