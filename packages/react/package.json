@@ -1,7 +1,6 @@
 {
   "name": "chat-conversation-react",
-  "private": true,
-  "version": "1.0.0",
+  "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.umd.js",
   "module": "./dist/index.es.js",
@@ -14,7 +13,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "README.en.md"
   ],
   "scripts": {
     "dev": "vite",
@@ -56,5 +57,13 @@
     "react",
     "ai",
     "typescript"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FerretAngel/chat-conversation"
+  },
+  "homepage": "https://github.com/FerretAngel/chat-conversation#readme",
+  "bugs": {
+    "url": "https://github.com/FerretAngel/chat-conversation/issues"
+  }
 }

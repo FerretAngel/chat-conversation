@@ -5,10 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev":"pnpm --filter page dev",
-    "build:page":"pnpm --filter page build",
-    "build:react":"pnpm --filter react build",
-    "preview":"pnpm --filter page preview"
+    "dev": "pnpm --filter page dev",
+    "build:page": "pnpm --filter page build",
+    "build:react": "pnpm --filter react build",
+    "preview": "pnpm --filter page preview"
   },
   "author": "ferretangel",
   "license": "MIT",
@@ -30,5 +30,13 @@
     "react",
     "ai",
     "typescript"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FerretAngel/chat-conversation"
+  },
+  "homepage": "https://github.com/FerretAngel/chat-conversation#readme",
+  "bugs": {
+    "url": "https://github.com/FerretAngel/chat-conversation/issues"
+  }
 }
