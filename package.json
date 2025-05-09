@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "pnpm --filter page dev",
     "build:page": "pnpm --filter page build",
-    "build:react": "pnpm --filter chat-conversation-react build",
+    "build": "pnpm --filter chat-conversation-react build",
     "preview": "pnpm --filter page preview"
   },
   "author": "ferretangel",

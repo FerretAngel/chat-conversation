@@ -1,6 +1,6 @@
 {
   "name": "chat-conversation-react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "main": "./dist/index.umd.js",
   "module": "./dist/index.es.js",
@@ -24,8 +24,8 @@
     "preview": "vite preview"
   },
   "peerDependencies": {
-    "react": "^18.2.21",
-    "react-dom": "^18.2.21",
+    "react": ">=17 || >= 18 || >= 19",
+    "react-dom": ">=17 || >= 18 || >=19",
     "framer-motion": "^12.9.2",
     "react-virtuoso": "^4.12.7"
   },
