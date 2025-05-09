@@ -1,4 +1,4 @@
-import React from "react";
+import { type ReactNode } from "react";
 import { Virtuoso, type VirtuosoProps } from "react-virtuoso";
 import { cn } from "../utils";
 import type {
@@ -27,7 +27,7 @@ export interface ConversationRenderProps<T extends object, C>
   scrollToBottomButton?: (
     isStickyBottom: boolean,
     scrollToBottom: (behavior?: "smooth" | "auto") => void
-  ) => React.ReactNode;
+  ) => ReactNode;
 }
 
 export const ConversationRender = <T extends object, C>({
@@ -50,7 +50,9 @@ export const ConversationRender = <T extends object, C>({
           initialTopMostItemIndex={messageList.length - 1}
           customScrollParent={containerRef.current ?? undefined}
           data={messageList}
-          itemContent={(_, item, context) => renderItem(item, context)}
+          itemContent={(_, item, context) =>
+            renderItem(item, context)
+          }
           {...virtuosoProps}
         />
       </section>

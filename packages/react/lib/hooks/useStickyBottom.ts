@@ -7,7 +7,7 @@ export interface StickyBottomProps {
 }
 
 export interface StickyBottomReturn {
-  containerRef: React.RefObject<HTMLDivElement | null>;
+  containerRef: React.RefObject<HTMLElement>;
   observe: () => void;
   unobserve: () => void;
   scrollToBottom: (behavior?: "smooth" | "auto") => void;
@@ -15,7 +15,7 @@ export interface StickyBottomReturn {
 }
 
 export const useStickyBottom = ({ throttle = 300, stickyBottomThreshold = 100 }: StickyBottomProps = {}): StickyBottomReturn => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
   const [isStickyBottom, setIsStickyBottom] = useState(false);
   const observer = useRef<MutationObserver>(new MutationObserver(() => {
     scrollToBottom("smooth")
