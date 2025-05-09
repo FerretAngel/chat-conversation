@@ -1,3 +1,4 @@
+"use client";
 import { type ReactNode } from "react";
 import { Virtuoso, type VirtuosoProps } from "react-virtuoso";
 import { cn } from "../utils";
@@ -50,9 +51,7 @@ export const ConversationRender = <T extends object, C>({
           initialTopMostItemIndex={messageList.length - 1}
           customScrollParent={containerRef.current ?? undefined}
           data={messageList}
-          itemContent={(_, item, context) =>
-            renderItem(item, context)
-          }
+          itemContent={(_, item, context) => renderItem(item, context)}
           {...virtuosoProps}
         />
       </section>

@@ -1,3 +1,4 @@
+"use client"
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounce, useThrottle } from "../utils";
 const userBreakEventList = ['wheel', 'touchstart', 'touchmove'] as const;
@@ -6,20 +7,18 @@ export interface StickyBottomProps {
   stickyBottomThreshold?: number;
 }
 
-export interface StickyBottomReturn {
-  containerRef: React.RefObject<HTMLElement>;
+export interface StickyBottomReturn<T extends HTMLElement = HTMLElement> {
+  containerRef: React.RefObject<T>;
   observe: () => void;
   unobserve: () => void;
   scrollToBottom: (behavior?: "smooth" | "auto") => void;
   isStickyBottom: boolean;
 }
 
-export const useStickyBottom = ({ throttle = 300, stickyBottomThreshold = 100 }: StickyBottomProps = {}): StickyBottomReturn => {
-  const containerRef = useRef<HTMLElement | null>(null);
+export const useStickyBottom = <T extends HTMLElement = HTMLElement>({ throttle = 300, stickyBottomThreshold = 100 }: StickyBottomProps = {}): StickyBottomReturn<T> => {
+  const containerRef = useRef<T | null>(null);
   const [isStickyBottom, setIsStickyBottom] = useState(false);
-  const observer = useRef<MutationObserver>(new MutationObserver(() => {
-    scrollToBottom("smooth")
-  }));
+  const observer = useRef<MutationObserver | null>(null);
 
   const scrollToBottom = useCallback(useThrottle((behavior: "smooth" | "auto" = "smooth") => {
     if (!containerRef.current) return
@@ -31,7 +30,7 @@ export const useStickyBottom = ({ throttle = 300, stickyBottomThreshold = 100 }:
   }, throttle), [containerRef])
 
   const unobserve = useCallback(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !observer.current) return;
     const container = containerRef.current;
     observer.current.disconnect();
     setIsStickyBottom(false)
@@ -40,8 +39,6 @@ export const useStickyBottom = ({ throttle = 300, stickyBottomThreshold = 100 }:
     container.addEventListener('scroll', useDebounce(() => {
       const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight
       if (distanceToBottom <= stickyBottomThreshold) {
-        console.log('scrollToBottom');
-
         controller.abort()
         observe()
       }
@@ -49,7 +46,7 @@ export const useStickyBottom = ({ throttle = 300, stickyBottomThreshold = 100 }:
   }, [containerRef])
 
   const observe = useCallback(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !observer.current) return;
     const container = containerRef.current;
     setIsStickyBottom(true)
     observer.current.observe(container, {
@@ -78,6 +75,9 @@ export const useStickyBottom = ({ throttle = 300, stickyBottomThreshold = 100 }:
   }, [containerRef, unobserve])
 
   useEffect(() => {
+    observer.current = new MutationObserver(() => {
+      scrollToBottom("smooth")
+    })
     observe() // 初始化接管
     return () => {
       unobserve()
