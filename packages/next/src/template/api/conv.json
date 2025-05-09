@@ -1,0 +1,255 @@
+[
+  {
+    "id": "5ce16ae9-cbeb-4fff-9668-7e0e051317f9",
+    "time": "2024-07-31T11:32:52",
+    "content": "如何自己搭建vpn",
+    "attachments": [],
+    "model": null,
+    "role": 1,
+    "mod_result": 0,
+    "end_at": null,
+    "selected": true,
+    "children": [
+      {
+        "id": "83127fca-e6a6-4e98-9c3f-336aa2ebeda0",
+        "time": "2024-07-31T11:32:52",
+        "content": [
+          {
+            "id": "50d360b6-8b0b-4e80-bdf2-379120ca56ac",
+            "type": 1,
+            "args": {
+              "content": "搭建VPN可以增强网络安全性和隐私保护，以下是快速指南，帮你一步步在Linux服务器上搭建OpenVPN：\n\n### 环境准备：\n1. **确保有一台VPS或物理服务器**（例如运行Ubuntu）。\n2. **安装基本工具**：更新系统并安装必要软件包。\n   ```sh\n   sudo apt-get update && sudo apt-get upgrade\n   sudo apt-get install wget curl\n   ```\n\n### 安装OpenVPN：\n3. **安装Easy-RSA**（用于生成证书和密钥）。\n   ```sh\n   sudo apt-get install easy-rsa\n   ```\n\n4. **安装OpenVPN**。\n   ```sh\n   sudo apt-get install openvpn\n   ```\n\n### 配置OpenVPN服务端：\n5. **创建目录并配置Easy-RSA**。\n   ```sh\n   make-cadir ~/openvpn-ca\n   cd ~/openvpn-ca\n   ```\n\n6. **编辑vars文件**。\n   ```sh\n   nano vars\n   ```\n\n7. **设置关键参数（EXAMPLE_CA替换为你的信息，例如`\"CN\"`, `\"北京\"`, `\"北京\"`, `\"MyOrganization\"`, `\"MyOrganizationalUnit\"`, `\"server.myvpn.com\"`）**。\n\n8. **生成证书和密钥**。\n   ```sh\n   source vars\n   ./clean-all\n   ./build-ca\n   ./build-key-server server\n   ./build-dh\n   openvpn --genkey --secret keys/ta.key\n   ```\n\n9. **配置服务器端**。\n   ```sh\n   cd /etc/openvpn\n   sudo cp ~/openvpn-ca/keys/{server.crt,server.key,ca.crt,dh2048.pem,ta.key} .\n   sudo nano server.conf\n   ```\n\n   在`server.conf`文件中，配置基本参数，例如：\n   ```sh\n   port 1194\n   proto udp\n   dev tun\n   ca ca.crt\n   cert server.crt\n   key server.key\n   dh dh2048.pem\n   auth SHA256\n   ...\n   ```\n\n### 配置防火墙：\n10. **打开防火墙并配置NAT**。\n    ```sh\n    sudo ufw allow 1194/udp\n    sudo ufw allow OpenSSH\n    sudo ufw disable\n    sudo ufw enable\n    sudo ufw status\n    ```\n\n    添加NAT规则到`/etc/ufw/before.rules`。\n    ```sh\n    *nat\n    :POSTROUTING ACCEPT [0:0]\n    -A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE\n    COMMIT\n    ```\n\n    激活转发。\n    ```sh\n    echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward\n    ```\n\n    并且在`/etc/sysctl.conf`文件中取消对`net.ipv4.ip_forward=1`这一行的注释。\n\n### 启动OpenVPN：\n11. **启动并启用OpenVPN服务**。\n    ```sh\n    sudo systemctl start openvpn@server\n    sudo systemctl enable openvpn@server\n    ```\n\n### 配置客户端：\n12. **生成客户端证书**。\n    ```sh\n    cd ~/openvpn-ca\n    source vars\n    ./build-key client1\n    ```\n\n13. **配置客户端文件，并将证书复制到客户端**。\n    ```sh\n    mkdir -p ~/client-configs/keys\n    cp ~/openvpn-ca/keys/{ca.crt,client1.crt,client1.key,ta.key} ~/client-configs/keys/\n    nano ~/client-configs/base.conf\n    ```\n\n    在`base.conf`中填写以下内容：\n    ```sh\n    client\n    dev tun\n    proto udp\n    remote YOUR_SERVER_IP 1194\n    resolv-retry infinite\n    nobind\n    user nobody\n    group nogroup\n    persist-key\n    persist-tun\n    ca [inline]\n    cert [inline]\n    key [inline]\n    tls-auth [inline] 1\n    cipher AES-256-CBC\n    auth SHA256\n    key-direction 1\n    verb 3\n    ```\n\n14. **生成客户端配置文件"
+            }
+          }
+        ],
+        "attachments": null,
+        "model": "abb9b38483d543b887cd55d865ecb70c",
+        "role": 2,
+        "mod_result": 0,
+        "end_at": "2024-07-31T11:33:01",
+        "selected": false,
+        "children": []
+      },
+      {
+        "id": "c59aa549-fbc6-4535-a5e7-41c408668066",
+        "time": "2024-07-31T11:34:19",
+        "content": [
+          {
+            "id": "06610c3d-0bc7-494c-8cc1-839cab2648c7",
+            "type": 1,
+            "args": {
+              "content": "自己搭建VPN需要多个步骤，以下是一个基本的指南，帮助你在自己的服务器上搭建OpenVPN，这是一款广泛使用的开源VPN解决方案。\n\n### 1. 选择并准备服务器\n首先，您需要一台服务器。可以选择在本地搭建服务器或使用云服务提供商（如AWS、Google Cloud、DigitalOcean等）。本指南假设使用的是Linux服务器（例如Ubuntu）。\n\n### 2. 安装OpenVPN和Easy-RSA\n在服务器上执行以下命令来安装OpenVPN和Easy-RSA：\n\n```bash\nsudo apt-get update\nsudo apt-get install openvpn easy-rsa\n```\n\n### 3. 设置Easy-RSA\nEasy-RSA是一套工具，帮助生成服务器和客户端的证书和密钥。\n\n```bash\nmake-cadir ~/openvpn-ca\ncd ~/openvpn-ca\n```\n\n编辑 `vars` 文件，设置相关参数（如CA证书的默认参数）：\n\n```bash\nnano vars\n```\n\n找到并修改以下几行（根据实际情况调整）：\n\n```\nset_var EASYRSA_REQ_COUNTRY    \"YourCountry\"\nset_var EASYRSA_REQ_PROVINCE   \"YourProvince\"\nset_var EASYRSA_REQ_CITY       \"YourCity\"\nset_var EASYRSA_REQ_ORG        \"YourOrg\"\nset_var EASYRSA_REQ_EMAIL      \"your-email@example.com\"\nset_var EASYRSA_REQ_OU         \"YourOrgUnit\"\n```\n\n加载设置并初始化PKI：\n\n```bash\nsource vars\n./clean-all\n./build-ca\n```\n\n### 4. 创建服务器证书和密钥\n继续使用Easy-RSA生成服务器证书和密钥：\n\n```bash\n./build-key-server server\n```\n\n### 5. 生成Diffie-Hellman参数\n这一步可能需要一些时间：\n\n```bash\n./build-dh\n```\n\n生成HMAC密钥：\n\n```bash\nopenvpn --genkey --secret keys/ta.key\n```\n\n### 6. 配置OpenVPN\n复制示例配置文件并进行编辑：\n\n```bash\nsudo cp /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz /etc/openvpn/\nsudo gzip -d /etc/openvpn/server.conf.gz\nsudo nano /etc/openvpn/server.conf\n```\n\n在配置文件中，确保以下内容（根据实际情况调整）：\n\n```bash\nca ca.crt\ncert server.crt\nkey server.key\ndh dh2048.pem\ntls-auth ta.key 0\ncipher AES-256-CBC\nauth SHA256\n```\n\n### 7. 配置网络和防火墙\n启用IP转发：\n\n```bash\nsudo nano /etc/sysctl.conf\n```\n\n取消以下行注释：\n\n```\nnet.ipv4.ip_forward=1\n```\n\n使更改生效：\n\n```bash\nsudo sysctl -p\n```\n\n设置防火墙规则以允许VPN流量：\n\n```bash\nsudo ufw allow 1194/udp\nsudo ufw allow OpenSSH\n```\n\n配置NAT：\n\n```bash\nsudo ufw disable\nsudo ufw enable\nsudo ufw default allow outgoing\nsudo ufw default deny incoming\nsudo ufw allow ssh\nsudo ufw allow 1194/udp\nsudo ufw enable\n```\n\n### 8. 启动OpenVPN\n启动并启用OpenVPN服务：\n\n```bash\nsudo systemctl start openvpn@server\nsudo systemctl enable openvpn@server\n```\n\n### 9. 创建客户端配置\n生成客户端证书和密钥：\n\n```bash\ncd ~/openvpn-ca\nsource vars\n./build-key client\n```\n\n创建客户端配置文件(client.ovpn)，内容如下（根据实际情况调整）：\n\n```text\nclient\ndev tun\nproto udp\nremote YOUR_SERVER_IP 1194\nresolv-retry infinite\nnobind\npersist-key\npersist-tun\nca ca.crt\ncert client.crt\nkey client.key\ntls-auth ta.key 1\ncipher AES-256-CBC\nauth SHA256\ncomp-lzo\nverb 3\n```\n\n将以下证书和密钥文件复制到客户端设备：\n\n- ca.crt\n- client.crt\n- client.key\n- ta.key\n\n### 10. 连接VPN\n配置好客户端之后，即可使用OpenVPN客户端连接到VPN。\n\n通过以上步骤，就可以成功搭建自己的VPN服务器，并保持安全稳定的网络连接。如果有任何问题或需要更详细的说明，请进一步查阅OpenVPN官方文档或相关教程。"
+            }
+          }
+        ],
+        "attachments": null,
+        "model": "abb9b38483d543b887cd55d865ecb70c",
+        "role": 2,
+        "mod_result": 0,
+        "end_at": "2024-07-31T11:34:36",
+        "selected": true,
+        "children": [
+          {
+            "id": "6a835b64-cf49-4606-8a3e-4a6e0c3ee79c",
+            "time": "2024-07-31T11:36:05",
+            "content": "在中国哪里可以购买到稳定的vpn服务？",
+            "attachments": [],
+            "model": null,
+            "role": 1,
+            "mod_result": 0,
+            "end_at": null,
+            "selected": false,
+            "children": [
+              {
+                "id": "60858b80-1bf9-4f3e-a2d5-feeded8782a1",
+                "time": "2024-07-31T11:36:05",
+                "content": [],
+                "attachments": null,
+                "model": "abb9b38483d543b887cd55d865ecb70c",
+                "role": 2,
+                "mod_result": 0,
+                "end_at": "2024-07-31T11:36:05",
+                "selected": false,
+                "children": []
+              },
+              {
+                "id": "adee5b1e-847c-44a1-8c52-bdfab962079c",
+                "time": "2024-07-31T11:36:10",
+                "content": [],
+                "attachments": null,
+                "model": "abb9b38483d543b887cd55d865ecb70c",
+                "role": 2,
+                "mod_result": 0,
+                "end_at": "2024-07-31T11:36:10",
+                "selected": true,
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "ec026929-1de2-45a7-ad91-174ea88bf00e",
+            "time": "2024-07-31T11:36:19",
+            "content": "哪里可以购买到稳定的vpn服务？",
+            "attachments": [],
+            "model": null,
+            "role": 1,
+            "mod_result": 0,
+            "end_at": null,
+            "selected": true,
+            "children": [
+              {
+                "id": "3708e14a-88c1-483f-9fcc-cc7e2061f652",
+                "time": "2024-07-31T11:36:19",
+                "content": [],
+                "attachments": null,
+                "model": "abb9b38483d543b887cd55d865ecb70c",
+                "role": 2,
+                "mod_result": 0,
+                "end_at": "2024-07-31T11:36:20",
+                "selected": false,
+                "children": []
+              },
+              {
+                "id": "c37889af-c150-4979-9f63-e44586cccc40",
+                "time": "2024-07-31T11:36:29",
+                "content": [],
+                "attachments": null,
+                "model": "abb9b38483d543b887cd55d865ecb70c",
+                "role": 2,
+                "mod_result": 0,
+                "end_at": "2024-07-31T11:36:30",
+                "selected": false,
+                "children": []
+              },
+              {
+                "id": "3498fd6c-fe39-4429-8597-874016dd7a3d",
+                "time": "2024-07-31T11:36:31",
+                "content": [],
+                "attachments": null,
+                "model": "abb9b38483d543b887cd55d865ecb70c",
+                "role": 2,
+                "mod_result": 0,
+                "end_at": "2024-07-31T11:36:31",
+                "selected": false,
+                "children": []
+              },
+              {
+                "id": "a23d4344-3a42-43f3-aad1-f7ce4a0ba15b",
+                "time": "2024-07-31T11:36:34",
+                "content": [],
+                "attachments": null,
+                "model": "abb9b38483d543b887cd55d865ecb70c",
+                "role": 2,
+                "mod_result": 0,
+                "end_at": "2024-07-31T11:36:35",
+                "selected": true,
+                "children": [
+                  {
+                    "id": "c2c28b70-21b3-48f8-8ae6-06dfb39d5e7b",
+                    "time": "2024-08-01T05:51:12",
+                    "content": "111",
+                    "attachments": [],
+                    "model": null,
+                    "role": 1,
+                    "mod_result": 0,
+                    "end_at": null,
+                    "selected": false,
+                    "children": [
+                      {
+                        "id": "7f80ce86-d55e-40d1-90fc-5f70feba9396",
+                        "time": "2024-08-01T05:51:12",
+                        "content": [
+                          {
+                            "id": "f3a4b524-850d-4a5e-afed-e556ad934523",
+                            "type": 1,
+                            "args": {
+                              "content": "关于购买稳定的VPN服务，这主要取决于你的具体需求，比如你所在的地区、你希望访问的内容以及你对速度和安全性的要求等等。\n\n### 在选择VPN服务时可以考虑以下几点：\n1. **安全性和隐私保护**：选择那些支持高级加密协议的VPN，比如OpenVPN、WireGuard等。\n2. **服务器地点**：拥有多个服务器地点可以提供更多的连接选择和更好的速度。\n3. **速度和稳定性**：选择评价中被认为速度快且稳定的服务。\n4. **客户支持**：良好的客服支持可以在你遇到问题时提供帮助。\n5. **价格和退款政"
+                            }
+                          }
+                        ],
+                        "attachments": null,
+                        "model": "48af5783a8374b1c901f7d6895276bfe",
+                        "role": 2,
+                        "mod_result": 0,
+                        "end_at": "2024-08-01T05:51:19",
+                        "selected": true,
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "id": "1455a0cc-746c-4a56-bf9d-39a92af7e54c",
+                    "time": "2024-08-01T11:48:12",
+                    "content": "晚上好",
+                    "attachments": [],
+                    "model": null,
+                    "role": 1,
+                    "mod_result": 0,
+                    "end_at": null,
+                    "selected": true,
+                    "children": [
+                      {
+                        "id": "d2688703-827b-4a2d-85da-bf604931cb41",
+                        "time": "2024-08-01T11:48:12",
+                        "content": [
+                          {
+                            "id": "b45a9d2c-51e1-421e-b14c-ecfddd76bd49",
+                            "type": 1,
+                            "args": {
+                              "content": "晚上好！关于购买稳定的VPN服务，有以下一些推荐的渠道和平台，这些服务提供商在市场上口碑良好：\n\n1. **ExpressVPN**\n   - 官方网站：[expressvpn.com](https://www.expressvpn.com)\n   - 强调高速连接和广泛的服务器网络。\n\n2. **NordVPN**\n   - 官方网站：[nordvpn.com](https://www.nordvpn.com)\n   - 提供了强大的安全功能和较多的服务器选择。\n\n3. **Surfshark**\n   - 官方网站：[surfshark.com](https://www.surfshark.com)\n   - 价格较为实惠，同时支持无限设备连接。\n\n4. **CyberGhost**\n   - 官方网站：[cyberghostvpn.com](https://www.cyberghostvpn.com)\n   - 用户界面友好，适合初学者使用。\n\n5. **Private Internet Access (PIA)**\n   - 官方网站：[privateinternetaccess.com](https://www.privateinternetaccess.com)\n   - 提供良好的隐私保护和较快的速度。\n\n建议您访问这些VPN提供商的官方网站，查看详细的服务介绍、套餐价格和用户评价。购买前还可以查阅一些第三方评论和比较网站，如TrustPilot或CNET，以确保找到最适合您的需求和预算的服务。"
+                            }
+                          }
+                        ],
+                        "attachments": null,
+                        "model": "abb9b38483d543b887cd55d865ecb70c",
+                        "role": 2,
+                        "mod_result": 0,
+                        "end_at": "2024-08-01T11:48:16",
+                        "selected": true,
+                        "children": [
+                          {
+                            "id": "8f93807c-f96c-4e85-b594-beb3bdac6413",
+                            "time": "2024-08-01T11:50:01",
+                            "content": "谁家的支持clash",
+                            "attachments": [],
+                            "model": null,
+                            "role": 1,
+                            "mod_result": 0,
+                            "end_at": null,
+                            "selected": true,
+                            "children": [
+                              {
+                                "id": "5c3cd51c-5e3a-4f8c-ac6e-12b863a60455",
+                                "time": "2024-08-01T11:50:01",
+                                "content": [
+                                  {
+                                    "id": "f903f4ae-5dee-4ce4-ad42-a94606eac4f1",
+                                    "type": 1,
+                                    "args": {
+                                      "content": "Clash 是一个跨平台的网络代理软件，支持多种代理协议和配置文件格式。以下是一些支持Clash并提供Clash 配置文件（Clash config）的VPN服务提供商：\n\n1. **TrojanHub**\n   - 支持Clash和多种协议，适合需要高隐私和穿透性的用户。\n\n2. **V2Ray**\n   - 许多提供 V2Ray 服务的供应商也提供 Clash 配置文件。\n\n3. **Surge**\n   - Surge 是一款针对网络代理和网络调试的应用，其配置文件与 Clash 兼容。\n\n4. **ClashX**\n   - 一些服务商会直接提供与 ClashX 兼容的配置文件，因为ClashX 是 macOS 上常用的客户端。\n\n5. **Chisel**\n   - 提供 Clash 配置文件，通常针对用户在国内外访问不同网络资源的需求。\n\n具体的VPN服务提供商可能会根据地区和具体政策有所不同，因此以下是几家声誉较好的服务商，并且可以提供与Clash兼容的配置文件：\n\n1. **Clash for Windows 官方网站**\n   - 提供的方法和教程： [Clash for Windows](https://github.com/Fndroid/clash_for_windows_pkg)\n\n2. **Shadowrocket 配置文件**\n   - 某些VPN服务商提供Shadowrocket的配置文件，该文件格式与Clash兼容。\n\n3. **一些「机场」服务**\n   - 比如极光、飞机场、小飞机，提供的服务一般也包括Clash配置文件。\n   - 这些服务网站和社区可以通过搜索关键词如“机场 Clash 配置文件”找到相关评测和订阅链接。\n\n购买前最好具体询问所感兴趣的服务商，确保他们提供与Clash兼容的配置文件，并查看用户评价和使用体验。"
+                                    }
+                                  }
+                                ],
+                                "attachments": null,
+                                "model": "abb9b38483d543b887cd55d865ecb70c",
+                                "role": 2,
+                                "mod_result": 0,
+                                "end_at": "2024-08-01T11:50:07",
+                                "selected": true,
+                                "children": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
