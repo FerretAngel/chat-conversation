@@ -1,17 +1,8 @@
 {
   "name": "chat-conversation-react",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
-  "main": "./dist/index.umd.js",
-  "module": "./dist/index.es.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
-    }
-  },
+  "main": "./lib/index.ts",
   "files": [
     "dist",
     "README.md",
@@ -26,10 +17,10 @@
   "peerDependencies": {
     "react": ">=17 || >= 18 || >= 19",
     "react-dom": ">=17 || >= 18 || >=19",
-    "framer-motion": "^12.9.2",
-    "react-virtuoso": "^4.12.7"
+    "react-virtuoso": ">=4"
   },
   "devDependencies": {
+    "framer-motion": "^12.9.2",
     "@eslint/js": "^9.25.0",
     "@vitejs/plugin-react": "^4.4.1",
     "eslint": "^9.25.0",

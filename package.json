@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter page dev",
+    "dev:next": "pnpm --filter next dev",
     "build:page": "pnpm --filter page build",
     "build": "pnpm --filter chat-conversation-react build",
     "preview": "pnpm --filter page preview"

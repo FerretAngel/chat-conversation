@@ -63,7 +63,7 @@ export const BotRender = ({
           setActive={setActive}
         />
       </header>
-      <p className="whitespace-pre-wrap relative group">
+      <p className="whitespace-pre-wrap relative group leading-6">
         {content.content}
         <IconButton
           className="absolute right-2 -top-2 opacity-0 group-hover:opacity-100 transition-all duration-300"
