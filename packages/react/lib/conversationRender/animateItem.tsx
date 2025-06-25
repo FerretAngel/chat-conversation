@@ -1,5 +1,9 @@
 "use client";
-import { motion, type AnimationProps, type MotionProps } from "framer-motion";
+import {
+  motion,
+  type AnimationProps,
+  type HTMLMotionProps,
+} from "framer-motion";
 import type { ConversationRenderProps, Context } from "./conversationRender";
 import type { MessageItem } from "../chatTree";
 import {
@@ -22,7 +26,7 @@ const defaultCustomInitValue: CustomInitValue = {
 };
 
 export interface AnimateItemProps<T extends object, C extends Context>
-  extends MotionProps {
+  extends HTMLMotionProps<"section"> {
   item: MessageItem<T>;
   context: C;
   renderItem: ConversationRenderProps<T, C>["renderItem"];
