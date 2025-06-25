@@ -1,10 +1,16 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client"
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type MutableRefObject } from "react";
 import { useDebounce, useThrottle } from "../utils";
 const userBreakEventList = ['wheel', 'touchstart', 'touchmove'] as const;
+
+export type ScrollDirection = 'left' | 'right' | 'top' | 'bottom' | null;
+export const ScrollDirectionKey = 'SCROLL_DIRECTION'
+
 export interface StickyBottomProps {
   throttle?: number;
   stickyBottomThreshold?: number;
+  cacheMap: MutableRefObject<Map<string, any>>;
 }
 
 export interface StickyBottomReturn<T extends HTMLElement = HTMLElement> {
@@ -15,11 +21,10 @@ export interface StickyBottomReturn<T extends HTMLElement = HTMLElement> {
   isStickyBottom: boolean;
 }
 
-export const useStickyBottom = <T extends HTMLElement = HTMLElement>({ throttle = 300, stickyBottomThreshold = 100 }: StickyBottomProps = {}): StickyBottomReturn<T> => {
+export const useStickyBottom = <T extends HTMLElement = HTMLElement>({ throttle = 300, stickyBottomThreshold = 100, cacheMap }: StickyBottomProps): StickyBottomReturn<T> => {
   const containerRef = useRef<T | null>(null);
   const [isStickyBottom, setIsStickyBottom] = useState(false);
   const observer = useRef<MutationObserver | null>(null);
-
   const scrollToBottom = useCallback(useThrottle((behavior: "smooth" | "auto" = "smooth") => {
     if (!containerRef.current) return
     const container = containerRef.current;
@@ -84,11 +89,38 @@ export const useStickyBottom = <T extends HTMLElement = HTMLElement>({ throttle 
     }
   }, [observe, unobserve])
 
+  const lastScrollLeft = useRef(0)
+  const lastScrollTop = useRef(0)
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const contaner = containerRef.current
+    contaner.addEventListener('scroll', () => {
+      if (!containerRef.current) return;
+      const contaner = containerRef.current
+      const scrollLeft = contaner.scrollLeft
+      const scrollTop = contaner.scrollTop
+      if (scrollLeft > lastScrollLeft.current) {
+        cacheMap.current.set(ScrollDirectionKey, 'right')
+      } else if (scrollLeft < lastScrollLeft.current) {
+        cacheMap.current.set(ScrollDirectionKey, 'left')
+      } else if (scrollTop > lastScrollTop.current) {
+        cacheMap.current.set(ScrollDirectionKey, 'bottom')
+      } else if (scrollTop < lastScrollTop.current) {
+        cacheMap.current.set(ScrollDirectionKey, 'top')
+      } else {
+        cacheMap.current.delete(ScrollDirectionKey)
+      }
+      lastScrollLeft.current = scrollLeft
+      lastScrollTop.current = scrollTop
+    })
+
+  }, [])
+
   return {
     containerRef,
     observe,
     unobserve,
     scrollToBottom,
-    isStickyBottom
+    isStickyBottom,
   }
 }

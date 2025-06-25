@@ -1,4 +1,4 @@
-import { cn, ConversationRender } from "chat-conversation-react";
+import { cn, ConversationRender, AnimateItem } from "chat-conversation-react";
 import { useConversation } from "../context";
 import { RenderItem } from "./renderItem";
 import { AddMessage } from "../components/addMessage";
@@ -6,9 +6,7 @@ import { IconButton } from "../components/IconButton";
 import { useEffect } from "react";
 import { getMessage } from "../api";
 
-export interface RenderProps {}
-
-export const Render = ({}: RenderProps) => {
+export const Render = () => {
   const { messageList, setConversation } = useConversation();
 
   // 初始化数据
@@ -16,20 +14,25 @@ export const Render = ({}: RenderProps) => {
     getMessage().then((res) => {
       setConversation(res);
     });
-  }, []);
+  }, [setConversation]);
   return (
     <div className="h-[100dvh] w-[100dvw] ">
       <div className="max-w-2xl mx-auto h-full overflow-hidden relative">
         <ConversationRender
-          className="w-full h-full pb-24 overflow-y-auto"
+          className="w-full h-full pb-24 overflow-y-auto overflow-x-hidden"
           // 计算后的列表数据
           messageList={messageList}
           // 自定义渲染列表元素
-          renderItem={(item) => (
-            <RenderItem
-              key={item.id}
-              className="my-2 mx-2"
-              {...item}
+          renderItem={(item, context) => (
+            <AnimateItem
+              item={item}
+              context={context}
+              renderItem={(item) => (
+                <RenderItem
+                  key={item.id}
+                  {...item}
+                />
+              )}
             />
           )}
           // 自定义渲染滚动到底部按钮

@@ -1,5 +1,5 @@
 "use client";
-import { type ReactNode } from "react";
+import { useRef, type MutableRefObject, type ReactNode } from "react";
 import { Virtuoso, type VirtuosoProps } from "react-virtuoso";
 import { cn } from "../utils";
 import type {
@@ -10,7 +10,13 @@ import {
   type StickyBottomProps,
   useStickyBottom,
 } from "../hooks/useStickyBottom";
-export interface ConversationRenderProps<T extends object, C>
+
+export interface Context extends Object {
+  index: number; // 当前消息的索引
+  cacheMap: MutableRefObject<Map<string, any>>; // 缓存map
+}
+
+export interface ConversationRenderProps<T extends object, C extends Context>
   extends BaseProps<T> {
   className?: string;
   virtuosoProps?: Omit<
@@ -31,7 +37,7 @@ export interface ConversationRenderProps<T extends object, C>
   ) => ReactNode;
 }
 
-export const ConversationRender = <T extends object, C>({
+export const ConversationRender = <T extends object, C extends Context>({
   messageList,
   renderItem,
   className,
@@ -39,8 +45,12 @@ export const ConversationRender = <T extends object, C>({
   virtuosoProps,
   scrollToBottomButton,
 }: ConversationRenderProps<T, C>) => {
-  const { containerRef, scrollToBottom, isStickyBottom } =
-    useStickyBottom(stickyBottomProps);
+  // 子组件做缓存使用
+  const cacheMap = useRef<Map<string, any>>(new Map());
+  const { containerRef, scrollToBottom, isStickyBottom } = useStickyBottom({
+    ...stickyBottomProps,
+    cacheMap,
+  });
 
   return (
     <>
@@ -51,7 +61,13 @@ export const ConversationRender = <T extends object, C>({
           initialTopMostItemIndex={messageList.length - 1}
           customScrollParent={containerRef.current ?? undefined}
           data={messageList}
-          itemContent={(_, item, context) => renderItem(item, context)}
+          itemContent={(index, item, context) =>
+            renderItem(item, {
+              ...context,
+              index,
+              cacheMap,
+            })
+          }
           {...virtuosoProps}
         />
       </section>

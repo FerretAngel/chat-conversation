@@ -1,12 +1,10 @@
-import { type MessageItemWithMeta } from "chat-conversation-react";
+import { type MessageItem } from "chat-conversation-react";
 import { type IMessageInterface } from "../context";
 import { BotRender } from "./bot.render";
 import { UserRender } from "./user.render";
 
-export interface RenderItemProps
-  extends MessageItemWithMeta<IMessageInterface> {
+export interface RenderItemProps extends MessageItem<IMessageInterface> {
   className?: string;
-  setActive: (direction: "prev" | "next") => void;
 }
 
 export const RenderItem = (props: RenderItemProps) => {

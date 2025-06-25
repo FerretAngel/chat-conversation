@@ -17,11 +17,23 @@ export default defineConfig({
       fileName: format => `index.${format}.js`,
     },
     rollupOptions: {
-      external: ["react", "react-dom", "*.svg"],
+      external: [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "react/jsx-dev-runtime",
+        "framer-motion",
+        "react-virtuoso",
+        "*.svg"
+      ],
       output: {
         globals: {
-          react: "react",
-          "react-dom": "react-dom",
+          react: "React",
+          "react-dom": "ReactDOM",
+          "react/jsx-runtime": "ReactJSXRuntime",
+          "react/jsx-dev-runtime": "ReactJSXDevRuntime",
+          "framer-motion": "FramerMotion",
+          "react-virtuoso": "ReactVirtuoso",
         },
       },
     },

@@ -1,4 +1,4 @@
-import { cn, ConversationRender } from "chat-conversation-react";
+import { cn, ConversationRender, AnimateItem } from "chat-conversation-react";
 import { useConversation } from "../context";
 import { RenderItem } from "./renderItem";
 import { AddMessage } from "../components/addMessage";
@@ -25,11 +25,17 @@ export const Render = ({}: RenderProps) => {
           // 计算后的列表数据
           messageList={messageList}
           // 自定义渲染列表元素
-          renderItem={(item) => (
-            <RenderItem
-              key={item.id}
-              className="my-2 mx-2"
-              {...item}
+          renderItem={(item, context) => (
+            <AnimateItem
+              item={item}
+              context={context}
+              renderItem={(item, context) => (
+                <RenderItem
+                  key={item.id}
+                  className="my-2 mx-2"
+                  {...item}
+                />
+              )}
             />
           )}
           // 自定义渲染滚动到底部按钮

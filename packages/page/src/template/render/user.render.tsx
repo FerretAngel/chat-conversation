@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import { cn } from "chat-conversation-react";
 import { useConversation } from "../context";
 import { ChatTraversa } from "./ChatTraversa";

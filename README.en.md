@@ -5,22 +5,25 @@
 This is an AI chat list component.
 - 🌳 Tree Data Management: Supports generic extensions, context switching, and significantly reduces the difficulty of maintaining chatConversationTree.
 - 📜 Virtual List Rendering: Uses [react-virtuoso](virtuoso.dev) component for virtual list rendering. Includes auto-scroll to bottom and other features, ready to use out of the box!
+- 🎬 Animation Component: High-extensibility animation component based on framer-motion, with scroll direction-aware animation effects.
 - 🔗 [Live Demo](https://ferretangel.github.io/chat-conversation/)
 
 # Future Plans
-- [ ] High-extensibility animation components based on framer-motion (currently unstable with virtual list, not yet released)
+- [x] Integrate with framer-motion to add basic animation effects for virtual lists
+- [ ] List item exit animations
 
 # Installation 📦
 ```cmd
-npm install chat-conversation-react react-virtuoso
+npm install chat-conversation-react react-virtuoso framer-motion
 ```
 ```cmd
-pnpm add chat-conversation-react react-virtuoso
+pnpm add chat-conversation-react react-virtuoso framer-motion
 ```
 ```cmd
-yarn add chat-conversation-react react-virtuoso
+yarn add chat-conversation-react react-virtuoso framer-motion
 ```
 If you don't need virtual list rendering, you can skip installing react-virtuoso
+If you don't need animation effects, you can skip installing framer-motion
 
 # Usage 📖
 ### 1. First, extend the data type using createConversationContext (Required)
@@ -55,7 +58,7 @@ ChatApp.displayName = "ChatApp";
 ### 3. Rendering Component (Optional, you can also render the list yourself)
 /render/index.tsx
 ```tsx
-import { cn, ConversationRender } from "chat-conversation-react";
+import { cn, ConversationRender, AnimateItem } from "chat-conversation-react";
 import { useConversation } from "../context";
 import { RenderItem } from "./renderItem";
 import { InputMessage } from "../components/input";
@@ -71,11 +74,27 @@ export const Render = ({}: RenderProps) => {
     // Calculated list data
     messageList={messageList}
     // Custom render list item
-    renderItem={(item) => (
-      <RenderItem
-        key={item.id}
-        className="my-2 mx-2"
-        {...item}
+    renderItem={(item, context) => (
+      <AnimateItem
+        item={item}
+        context={context}
+        renderItem={(item) => (
+          <RenderItem
+            key={item.id}
+            className="my-2 mx-2"
+            {...item}
+          />
+        )}
+        // Optional: Custom animation initial values
+        customInitValue={{
+          left: { x: -100, opacity: 0 },
+          right: { x: 100, opacity: 0 },
+          bottom: { y: 100, opacity: 0 },
+          top: { y: -100, opacity: 0 },
+        }}
+        // Optional: Other framer-motion animation properties
+        transition={{ duration: 0.3 }}
+        viewport={{ once: true }}
       />
     )}
     // Custom render scroll to bottom button
@@ -93,6 +112,78 @@ export const Render = ({}: RenderProps) => {
   />
 };
 Render.displayName = "ConversationRender";
+```
+
+#### 🎬 Adding Animation Effects
+`ConversationRender` supports adding rich animation effects to list items through the `AnimateItem` component:
+
+**Features:**
+- 🎯 **Scroll Direction Awareness**: Automatically selects animation effects based on scroll direction (up/down/left/right)
+- 🔧 **Highly Configurable**: Supports custom animation initial values for each direction
+- 🚀 **Performance Optimized**: Intelligent caching of animation states to avoid redundant calculations
+- 📱 **Responsive**: Supports viewport detection and viewport animations
+
+**Usage:**
+```tsx
+// Basic animation usage
+<ConversationRender
+  messageList={messageList}
+  renderItem={(item, context) => (
+    <AnimateItem
+      item={item}
+      context={context}
+      renderItem={(item) => <YourMessageComponent {...item} />}
+    />
+  )}
+/>
+
+// Custom animation effects
+<ConversationRender
+  messageList={messageList}
+  renderItem={(item, context) => (
+    <AnimateItem
+      item={item}
+      context={context}
+      renderItem={(item) => <YourMessageComponent {...item} />}
+      customInitValue={{
+        left: { x: -200, opacity: 0, scale: 0.8 },    // Left switch animation
+        right: { x: 200, opacity: 0, scale: 0.8 },    // Right switch animation
+        bottom: { y: 100, opacity: 0, rotateX: -10 }, // Scroll down animation
+        top: { y: -100, opacity: 0, rotateX: 10 },    // Scroll up animation
+      }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+    />
+  )}
+/>
+
+// Without animation, render directly
+<ConversationRender
+  messageList={messageList}
+  renderItem={(item, context) => (
+    <YourMessageComponent key={item.id} {...item} />
+  )}
+/>
+```
+
+**AnimateItem Configuration Options:**
+```tsx
+interface AnimateItemProps {
+  item: MessageItem<T>;              // Required: Message item data (automatically passed by ConversationRender)
+  context: Context;                  // Required: Render context (automatically passed by ConversationRender)
+  renderItem: (item) => ReactNode;   // Required: Your actual render function
+  customInitValue?: {                // Optional: Custom animation initial values
+    left?: AnimationProps["initial"];
+    right?: AnimationProps["initial"];
+    bottom?: AnimationProps["initial"];
+    top?: AnimationProps["initial"];
+  };
+  // Supports all framer-motion MotionProps
+  transition?: any;
+  viewport?: any;
+  onViewportEnter?: (entry) => void;
+  onViewportLeave?: (entry) => void;
+}
 ```
 
 ### 4. Sending Messages Reference 💬
@@ -204,8 +295,8 @@ root
           reducer.ts // Update store
           type.ts // Type definitions
         conversationRender // Virtual list component
-          animate // Animation components (not yet used)
           conversationRender.tsx // Virtual list rendering component
+          animateItem.tsx // Animation wrapper component
         hooks 
           useStickyBottom.ts // Auto-scroll to bottom hook
         utils

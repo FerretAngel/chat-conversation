@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { cn } from "chat-conversation-react";
 import { Icon } from "@iconify/react";
 
@@ -12,7 +12,7 @@ export const IconButton = ({ icon, className, ...props }: IconButtonProps) => {
     <button
       className={cn("flex items-center justify-center", className)}
       {...props}>
-      {/* <Icon icon={icon} /> */}
+      <Icon icon={icon} />
     </button>
   );
 };
